@@ -10,7 +10,13 @@ return {
     config = function()
         require('telescope').setup({
             defaults = {
-                file_ignore_patterns = { "node_modules" },
+            file_ignore_patterns = {
+                "node_modules",
+                "dist",
+                "%.git/",
+                "build",
+                "target",
+               },
             }
         })
 
@@ -29,6 +35,26 @@ return {
             builtin.grep_string({ search = vim.fn.input("Grep > ") })
         end)
         vim.keymap.set('n', '<leader>vh', builtin.help_tags, {})
-    end
+
+        -- Git status (staged + unstaged + untracked)
+        vim.keymap.set("n", "<leader>pg", function()
+          builtin.git_status({
+            previewer = true,
+            layout_strategy = "horizontal",
+            layout_config = { preview_width = 0.6 },
+          })
+        end, { desc = "Git changed files (status)" })
+
+        -- Git diff vs HEAD (only modified files)
+        vim.keymap.set("n", "<leader>pG", function()
+          builtin.find_files({
+            prompt_title = "Git Diff Files",
+            find_command = { "git", "diff", "HEAD", "--name-only" },
+            previewer = true,
+            layout_strategy = "horizontal",
+            layout_config = { preview_width = 0.6 },
+          })
+        end, { desc = "Git diff files (with preview)" })
+  end
 }
 
