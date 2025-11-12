@@ -27,8 +27,8 @@ return {
 
     config = function()
         require("conform").setup({
-            formatters_by_ft = {
-            }
+          formatters_by_ft = {
+          }
         })
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
@@ -44,8 +44,8 @@ return {
             ensure_installed = {
                 "lua_ls",
                 "rust_analyzer",
-                "gopls",
                 "tailwindcss",
+                "ts_ls",
             },
             handlers = {
                 function(server_name) -- default handler (optional)
@@ -96,8 +96,29 @@ return {
                         filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte", "heex" },
                     })
                 end,
-            }
-        })
+              ["ts_ls"] = function()
+                local lspconfig = require("lspconfig")
+                lspconfig.ts_ls.setup({
+                  capabilities = capabilities,
+                  filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+                  settings = {
+                    typescript = {
+                      format = {
+                        indentSize = 2,
+                        convertTabsToSpaces = true,
+                      },
+                    },
+                    javascript = {
+                      format = {
+                        indentSize = 2,
+                        convertTabsToSpaces = true,
+                      },
+                    },
+                  },
+                })
+              end,
+      }
+    })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
 

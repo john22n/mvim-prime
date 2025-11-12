@@ -12,9 +12,11 @@ return {
 				cpp = { "clang-format" },
 				lua = { "stylua" },
 				go = { "gofmt" },
-				javascript = { "prettier" },
-				typescript = { "prettier" },
 				elixir = { "mix" },
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        json = { "prettier" },
+        markdown = { "prettier" },
 			},
 			formatters = {
 				["clang-format"] = {
