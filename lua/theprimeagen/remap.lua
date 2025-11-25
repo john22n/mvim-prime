@@ -47,6 +47,9 @@ vim.keymap.set('v', '<S-Tab>', '<gv', { noremap = true, silent = true })
 vim.keymap.set('v', '<Tab>', '>gv', { noremap = true, silent = true })
 vim.keymap.set('n', '<Tab>', '>>', { noremap = true, silent = true })
 
+-- split buffer on current file to the right
+vim.keymap.set('n', '<leader>v', '<cmd>vsplit<CR>', { desc = "Open vertical split to the right" })
+
 --opens nvim plugin config file
 vim.keymap.set('n', '<leader>vpp', '<cmd>e $MYVIMRC<CR>', { noremap = true, silent = true })
 
@@ -81,4 +84,6 @@ end)
 vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
+
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show line diagnostics" })
 
