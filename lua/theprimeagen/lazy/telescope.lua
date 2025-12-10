@@ -16,6 +16,7 @@ return {
                 "%.git/",
                 "build",
                 "target",
+                "yarn.lock"
                },
             }
         })
