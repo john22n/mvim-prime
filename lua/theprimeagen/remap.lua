@@ -82,7 +82,14 @@ vim.keymap.set("n", "<leader>ca", function()
 end)
 
 vim.keymap.set("n", "<leader><leader>", function()
-    vim.cmd("so")
+    local ft = vim.bo.filetype
+    if ft == "lua" or ft == "vim" then
+        vim.cmd("so")
+    elseif ft == "zsh" or ft == "bash" or ft == "sh" then
+        print("Run 'source " .. vim.fn.expand("%:p") .. "' in your terminal")
+    else
+        print("Don't know how to source ." .. ft .. " files")
+    end
 end)
 
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show line diagnostics" })
