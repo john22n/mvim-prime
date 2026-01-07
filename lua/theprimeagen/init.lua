@@ -75,6 +75,19 @@ autocmd('LspAttach', {
     end
 })
 
+-- Auto-reload files when changed externally
+vim.opt.autoread = true
+
+autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group = ThePrimeagenGroup,
+  pattern = "*",
+  callback = function()
+    if vim.fn.mode() ~= "c" then
+      vim.cmd("checktime")
+    end
+  end,
+})
+
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
