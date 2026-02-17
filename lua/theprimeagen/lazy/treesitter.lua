@@ -3,21 +3,30 @@ return {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter.configs").setup({
+            require("nvim-treesitter").setup({
                 ensure_installed = {
                     "vimdoc", "javascript", "typescript", "c", "lua", "rust",
                     "jsdoc", "bash", "go",
                 },
                 sync_install = false,
                 auto_install = true,
-                indent = {
-                    enable = true
-                },
-                highlight = {
-                    enable = true,
-                    additional_vim_regex_highlighting = { "markdown" },
-                },
             })
+
+            -- Highlighting is now enabled via vim.treesitter.start()
+            vim.api.nvim_create_autocmd("FileType", {
+                callback = function()
+                    pcall(vim.treesitter.start)
+                end,
+            })
+
+            -- For markdown with additional regex highlighting
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "markdown",
+                callback = function()
+                    vim.bo.syntax = "on"
+                end,
+            })
+
             vim.treesitter.language.register("templ", "templ")
         end,
     },
