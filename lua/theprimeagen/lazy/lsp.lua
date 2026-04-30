@@ -102,7 +102,17 @@ return {
                 lspconfig.ts_ls.setup({
                   capabilities = capabilities,
                   filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
-                  settings = {
+                  on_attach = function(_, bufnr)
+                    vim.api.nvim_create_autocmd("BufWritePre", {
+                      buffer = bufnr,
+                      callback = function()
+                        vim.lsp.buf.code_action({
+                          context = { only = { "source.organizeImports" }, diagnostics = {} },
+                          apply = true,
+                        })
+                      end,
+                    })
+                  end,                  settings = {
                     typescript = {
                       format = {
                         indentSize = 2,
