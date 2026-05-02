@@ -26,6 +26,8 @@ end
 vim.filetype.add({
     extension = {
         templ = 'templ',
+        tsx = 'typescriptreact',
+        jsx = 'javascriptreact',
     }
 })
 
