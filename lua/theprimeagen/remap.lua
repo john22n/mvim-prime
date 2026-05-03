@@ -127,7 +127,7 @@ vim.keymap.set("n", "<leader><leader>", function()
 end)
 
 -- Show diagnostic float window for current line
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show line diagnostics" })
+vim.keymap.set("n", "<leader>e", function() vim.diagnostic.open_float({ focusable = true }) end, { desc = "Show line diagnostics" })
 
 -- Send all diagnostics to the location list
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
