@@ -43,6 +43,7 @@ return {
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
+                "pyright",
                 "rust_analyzer",
                 "tailwindcss",
                 "ts_ls",
@@ -53,6 +54,32 @@ return {
                     require("lspconfig")[server_name].setup {
                         capabilities = capabilities
                     }
+                end,
+
+                ['pyright'] = function()
+                  local lspconfig = require("lspconfig")
+
+                  lspconfig.pyright.setup({
+                    capabilities = capabilities,
+
+                    root_dir = lspconfig.util.root_pattern(
+                      "pyrightconfig.json",
+                      "pyproject.toml",
+                      ".git"
+                    ),
+
+                    before_init = function(_, config)
+                      local venv_python = config.root_dir .. "/.venv/bin/python"
+
+                      if vim.fn.executable(venv_python) == 1 then
+                        config.settings.python.pythonPath = venv_python
+                      end
+                    end,
+
+                    settings = {
+                      python = {}
+                    },
+                  })
                 end,
 
                 ['zls'] = function()
@@ -102,6 +129,12 @@ return {
                 lspconfig.ts_ls.setup({
                   capabilities = capabilities,
                   filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+                  init_options = {
+                    hostInfo = "neovim",
+                    tsserver = {
+                      fallbackPath = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
+                    },
+                  },
                   on_attach = function(_, bufnr)
                     vim.api.nvim_create_autocmd("BufWritePre", {
                       buffer = bufnr,
