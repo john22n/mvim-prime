@@ -1,15 +1,15 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        lazy = false,
         build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter").setup({
-                ensure_installed = {
-                    "vimdoc", "javascript", "typescript", "c", "lua", "rust",
-                    "jsdoc", "bash", "go",
-                },
-                sync_install = false,
-                auto_install = true,
+            local treesitter = require("nvim-treesitter")
+            treesitter.setup()
+            treesitter.install({
+                "vimdoc", "javascript", "typescript", "c", "lua", "rust",
+                "jsdoc", "bash", "go", "markdown", "markdown_inline",
             })
 
             -- Highlighting is now enabled via vim.treesitter.start()
