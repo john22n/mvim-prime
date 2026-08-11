@@ -69,10 +69,20 @@ return {
                     ),
 
                     before_init = function(_, config)
-                      local venv_python = config.root_dir .. "/.venv/bin/python"
+                      local python_paths = {
+                        config.root_dir .. "/.venv/bin/python",
+                        config.root_dir .. "/venv/bin/python",
+                      }
 
-                      if vim.fn.executable(venv_python) == 1 then
-                        config.settings.python.pythonPath = venv_python
+                      if vim.env.VIRTUAL_ENV then
+                        table.insert(python_paths, 1, vim.env.VIRTUAL_ENV .. "/bin/python")
+                      end
+
+                      for _, python_path in ipairs(python_paths) do
+                        if vim.fn.executable(python_path) == 1 then
+                          config.settings.python.pythonPath = python_path
+                          break
+                        end
                       end
                     end,
 

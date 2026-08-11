@@ -10,6 +10,7 @@ return {
             treesitter.install({
                 "vimdoc", "javascript", "typescript", "c", "lua", "rust",
                 "jsdoc", "bash", "go", "markdown", "markdown_inline",
+                "python",
             })
 
             -- Highlighting is now enabled via vim.treesitter.start()
