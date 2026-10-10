@@ -8,7 +8,7 @@ return {
             local treesitter = require("nvim-treesitter")
             treesitter.setup()
             treesitter.install({
-                "vimdoc", "javascript", "typescript", "c", "lua", "rust",
+                "vimdoc", "javascript", "typescript", "tsx", "c", "lua", "rust",
                 "jsdoc", "bash", "go", "markdown", "markdown_inline",
                 "python",
             })

@@ -47,7 +47,8 @@ return {
                 "rust_analyzer",
                 "tailwindcss",
                 "ts_ls",
-                "harper_ls"
+                "harper_ls",
+                "yamlls",
             },
             handlers = {
                 function(server_name) -- default handler (optional)
@@ -187,6 +188,21 @@ return {
                       }
                     }
                   }
+                })
+              end,
+              ["yamlls"] = function()
+                require("lspconfig").yamlls.setup({
+                  capabilities = capabilities,
+                  settings = {
+                    yaml = {
+                      validate = true,
+                      hover = true,
+                      completion = true,
+                      schemaStore = {
+                        enable = true,
+                      },
+                    },
+                  },
                 })
               end,
       }
