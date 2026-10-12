@@ -31,8 +31,8 @@ vim.keymap.set("n", "N", "Nzzzv")
 -- Format current paragraph and return cursor to original position
 vim.keymap.set("n", "=ap", "ma=ap'a")
 
--- Restart LSP servers (useful when LSP gets stuck)
-vim.keymap.set("n", "<leader>zig", "<cmd>LspRestart<cr>")
+-- Restart LSP servers attached to the current buffer
+vim.keymap.set("n", "<leader>zig", "<cmd>lsp restart<cr>")
 
 -- Paste over selection without losing yanked text (deletes to black hole register first)
 vim.keymap.set("x", "<leader>p", [["_dP]])

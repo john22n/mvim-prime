@@ -1,45 +1,133 @@
-local root_files = {
-  '.luarc.json',
-  '.luarc.jsonc',
-  '.luacheckrc',
-  '.stylua.toml',
-  'stylua.toml',
-  'selene.toml',
-  'selene.yml',
-  '.git',
-}
-
 return {
     "neovim/nvim-lspconfig",
     dependencies = {
-        "stevearc/conform.nvim",
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-        "hrsh7th/cmp-cmdline",
         "hrsh7th/nvim-cmp",
-        "L3MON4D3/LuaSnip",
-        "saadparwaiz1/cmp_luasnip",
         "j-hui/fidget.nvim",
     },
 
     config = function()
-        require("conform").setup({
-          formatters_by_ft = {
-          }
+        vim.lsp.config("*", {
+            capabilities = require("cmp_nvim_lsp").default_capabilities(),
         })
-        local cmp = require('cmp')
-        local cmp_lsp = require("cmp_nvim_lsp")
-        local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            cmp_lsp.default_capabilities())
 
         require("fidget").setup({})
         require("mason").setup()
+
+        vim.lsp.config("pyright", {
+            root_markers = { "pyrightconfig.json", "pyproject.toml", ".git" },
+            before_init = function(_, config)
+                local root_dir = config.root_dir or vim.fn.getcwd()
+                local python_paths = {
+                    root_dir .. "/.venv/bin/python",
+                    root_dir .. "/venv/bin/python",
+                }
+
+                if vim.env.VIRTUAL_ENV then
+                    table.insert(python_paths, 1, vim.env.VIRTUAL_ENV .. "/bin/python")
+                end
+
+                for _, python_path in ipairs(python_paths) do
+                    if vim.fn.executable(python_path) == 1 then
+                        config.settings.python.pythonPath = python_path
+                        break
+                    end
+                end
+            end,
+            settings = { python = {} },
+        })
+
+        vim.lsp.config("zls", {
+            root_markers = { ".git", "build.zig", "zls.json" },
+            settings = {
+                zls = {
+                    enable_inlay_hints = true,
+                    enable_snippets = true,
+                    warn_style = true,
+                },
+            },
+        })
+        vim.g.zig_fmt_parse_errors = 0
+        vim.g.zig_fmt_autosave = 0
+
+        vim.lsp.config("lua_ls", {
+            settings = {
+                Lua = {
+                    format = {
+                        enable = true,
+                        defaultConfig = {
+                            indent_style = "space",
+                            indent_size = "2",
+                        },
+                    },
+                },
+            },
+        })
+
+        vim.lsp.config("tailwindcss", {
+            filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte", "heex" },
+        })
+
+        vim.lsp.config("ts_ls", {
+            filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+            init_options = {
+                hostInfo = "neovim",
+                tsserver = {
+                    fallbackPath = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
+                },
+            },
+            on_attach = function(_, bufnr)
+                local group = vim.api.nvim_create_augroup("TypeScriptOrganizeImports" .. bufnr, { clear = true })
+                vim.api.nvim_create_autocmd("BufWritePre", {
+                    group = group,
+                    buffer = bufnr,
+                    callback = function()
+                        vim.lsp.buf.code_action({
+                            context = { only = { "source.organizeImports" }, diagnostics = {} },
+                            apply = true,
+                        })
+                    end,
+                })
+            end,
+            settings = {
+                typescript = {
+                    format = { indentSize = 2, convertTabsToSpaces = true },
+                },
+                javascript = {
+                    format = { indentSize = 2, convertTabsToSpaces = true },
+                },
+            },
+        })
+
+        vim.lsp.config("harper_ls", {
+            workspace_required = true,
+            filetypes = { "markdown", "gitcommit", "text" },
+            settings = {
+                ["harper-ls"] = {
+                    linters = {
+                        SentenceCapitalization = false,
+                        SpellCheck = true,
+                        RepeatedWords = true,
+                        Spaces = true,
+                    },
+                },
+            },
+        })
+
+        vim.lsp.config("yamlls", {
+            settings = {
+                yaml = {
+                    validate = true,
+                    hover = true,
+                    completion = true,
+                    schemaStore = { enable = true },
+                },
+            },
+        })
+
+        -- Configure servers before Mason automatically enables installed ones.
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
@@ -49,190 +137,11 @@ return {
                 "ts_ls",
                 "harper_ls",
                 "yamlls",
+                "terraformls",
             },
-            handlers = {
-                function(server_name) -- default handler (optional)
-                    require("lspconfig")[server_name].setup {
-                        capabilities = capabilities
-                    }
-                end,
-
-                ['pyright'] = function()
-                  local lspconfig = require("lspconfig")
-
-                  lspconfig.pyright.setup({
-                    capabilities = capabilities,
-
-                    root_dir = lspconfig.util.root_pattern(
-                      "pyrightconfig.json",
-                      "pyproject.toml",
-                      ".git"
-                    ),
-
-                    before_init = function(_, config)
-                      local python_paths = {
-                        config.root_dir .. "/.venv/bin/python",
-                        config.root_dir .. "/venv/bin/python",
-                      }
-
-                      if vim.env.VIRTUAL_ENV then
-                        table.insert(python_paths, 1, vim.env.VIRTUAL_ENV .. "/bin/python")
-                      end
-
-                      for _, python_path in ipairs(python_paths) do
-                        if vim.fn.executable(python_path) == 1 then
-                          config.settings.python.pythonPath = python_path
-                          break
-                        end
-                      end
-                    end,
-
-                    settings = {
-                      python = {}
-                    },
-                  })
-                end,
-
-                ['zls'] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.zls.setup({
-                        root_dir = lspconfig.util.root_pattern(".git", "build.zig", "zls.json"),
-                        settings = {
-                            zls = {
-                                enable_inlay_hints = true,
-                                enable_snippets = true,
-                                warn_style = true,
-                            },
-                        },
-                    })
-                    vim.g.zig_fmt_parse_errors = 0
-                    vim.g.zig_fmt_autosave = 0
-
-                end,
-                ["lua_ls"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.lua_ls.setup {
-                        capabilities = capabilities,
-                        settings = {
-                            Lua = {
-                                format = {
-                                    enable = true,
-                                    -- Put format options here
-                                    -- NOTE: the value should be STRING!!
-                                    defaultConfig = {
-                                        indent_style = "space",
-                                        indent_size = "2",
-                                    }
-                                },
-                            }
-                        }
-                    }
-                end,
-                ["tailwindcss"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.tailwindcss.setup({
-                        capabilities = capabilities,
-                        filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte", "heex" },
-                    })
-                end,
-              ["ts_ls"] = function()
-                local lspconfig = require("lspconfig")
-                lspconfig.ts_ls.setup({
-                  capabilities = capabilities,
-                  filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
-                  init_options = {
-                    hostInfo = "neovim",
-                    tsserver = {
-                      fallbackPath = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
-                    },
-                  },
-                  on_attach = function(_, bufnr)
-                    vim.api.nvim_create_autocmd("BufWritePre", {
-                      buffer = bufnr,
-                      callback = function()
-                        vim.lsp.buf.code_action({
-                          context = { only = { "source.organizeImports" }, diagnostics = {} },
-                          apply = true,
-                        })
-                      end,
-                    })
-                  end,                  settings = {
-                    typescript = {
-                      format = {
-                        indentSize = 2,
-                        convertTabsToSpaces = true,
-                      },
-                    },
-                    javascript = {
-                      format = {
-                        indentSize = 2,
-                        convertTabsToSpaces = true,
-                      },
-                    },
-                  },
-                })
-              end,
-              ["harper_ls"] = function()
-                local lspconfig = require("lspconfig")
-                lspconfig.harper_ls.setup({
-                  capabilities = capabilities,
-                  single_file_support = false,
-                  filetypes = { "markdown", "gitcommit", "text" },
-                  settings = {
-                    ["harper-ls"] = {
-                      linters = {
-                        SentenceCapitalization = false,
-                        SpellCheck = true,
-                        RepeatedWords = true,
-                        Spaces = true,
-                      }
-                    }
-                  }
-                })
-              end,
-              ["yamlls"] = function()
-                require("lspconfig").yamlls.setup({
-                  capabilities = capabilities,
-                  settings = {
-                    yaml = {
-                      validate = true,
-                      hover = true,
-                      completion = true,
-                      schemaStore = {
-                        enable = true,
-                      },
-                    },
-                  },
-                })
-              end,
-      }
-    })
-
-        local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-        cmp.setup({
-            snippet = {
-                expand = function(args)
-                    require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-                end,
-            },
-            mapping = cmp.mapping.preset.insert({
-                ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-                ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-                ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-                ["<C-Space>"] = cmp.mapping.complete(),
-            }),
-            sources = cmp.config.sources({
-                { name = "copilot", group_index = 2 },
-                { name = 'nvim_lsp' },
-                { name = 'luasnip' }, -- For luasnip users.
-            }, {
-                { name = 'buffer' },
-            })
         })
 
         vim.diagnostic.config({
-            -- update_in_insert = true,
             float = {
                 focusable = false,
                 style = "minimal",
@@ -242,5 +151,5 @@ return {
                 prefix = "",
             },
         })
-    end
+    end,
 }

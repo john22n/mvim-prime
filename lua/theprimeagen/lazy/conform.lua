@@ -3,9 +3,9 @@ return {
 	opts = {},
 	config = function()
 		require("conform").setup({
+			default_format_opts = { lsp_format = "fallback" },
 			format_on_save = {
 				timeout_ms = 5000,
-                lsp_format = "fallback",
 			},
 			formatters_by_ft = {
 				c = { "clang-format" },
@@ -14,9 +14,13 @@ return {
 				go = { "gofmt" },
 				elixir = { "mix" },
         javascript = { "prettier" },
+        javascriptreact = { "prettier" },
         typescript = { "prettier" },
+        typescriptreact = { "prettier" },
         json = { "prettier" },
         markdown = { "prettier" },
+        terraform = { "terraform_fmt" },
+        ["terraform-vars"] = { "terraform_fmt" },
 			},
 			formatters = {
 				["clang-format"] = {

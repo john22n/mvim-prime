@@ -1,6 +1,15 @@
 ### ThePrimeagen's init.lua
 Prerequisite: install [ripgrep](https://github.com/BurntSushi/ripgrep).
 
+### Terraform
+
+Terraform support includes `terraform-ls` (installed by Mason), HCL
+Tree-sitter highlighting, and `terraform fmt` for `.tf` and `.tfvars` files.
+Install the Terraform CLI and make sure `terraform` is on your PATH to use
+formatting on save or `<leader>f`. Restart Neovim after updating the config
+to let Mason and Tree-sitter install the language server and parser.
+Run `terraform init` in your Terraform project for provider-aware completion.
+
 [The full video of me setting up this repo](https://www.youtube.com/watch?v=w7i4amO_zaE)
 
 For anyone that is interested in my vimrc, i will have a commit log below
@@ -14,5 +23,4 @@ about though i would just suggest `git log -S`).
 * [81c770d2](https://github.com/ThePrimeagen/init.lua/commit/81c770d2d2e32e59916b39c7f5babbc8560f7a82) copilot testing
 * [4a96e645](https://github.com/ThePrimeagen/init.lua/commit/4a96e6457b0a0241ca7361ce62177aa6b9a33a38) fugitive mappings for push and pull
 * [a3bad06a](https://github.com/ThePrimeagen/init.lua/commit/a3bad06a4681c322538d609aa1c0bd18880f77c6) disabled eslint.  driving me crazy
-
 
